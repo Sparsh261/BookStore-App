@@ -67,7 +67,7 @@ app.put('/updatebook/:id', (req, res) => {
   if (!book) return res.status(404).json({ error: 'Book not found' });
 
   Object.assign(book, req.body);
-  res.json(book);
+  res.status(201).json(book);
 });
 
 // Delete

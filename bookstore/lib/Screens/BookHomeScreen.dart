@@ -20,6 +20,13 @@ class _BookHomeScreenState extends State<BookHomeScreen> {
     getData();
   }
 
+  void refresh() {
+    setState(() {
+        isLoaded = false;
+    });
+    getData();
+  }
+
   getData() async {
     allBooks = await BookRemoteServices().getAllBooks();
     if(allBooks.isNotEmpty){
@@ -39,10 +46,14 @@ class _BookHomeScreenState extends State<BookHomeScreen> {
       body: Visibility(
         visible: isLoaded,
         replacement: Center(child: CircularProgressIndicator()),
-        child: ListView.builder(
-          itemCount: allBooks.length,
-          itemBuilder: (context,index) => BookCard(book:allBooks[index])),
+        child: RefreshIndicator(
+          onRefresh: () async => refresh(),
+          child: ListView.builder(
+            itemCount: allBooks.length,
+            itemBuilder: (context,index) => BookCard(book:allBooks[index])),
+        ),
       ),
     );
   }
+  
 }

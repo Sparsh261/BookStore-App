@@ -1,4 +1,6 @@
 import 'package:bookstore/Model/Book.dart';
+import 'package:bookstore/Screens/BookHomeScreen.dart';
+import 'package:bookstore/Screens/BookUpdateScreen.dart';
 import 'package:bookstore/Services/BookRemoteServices.dart';
 import 'package:flutter/material.dart';
 
@@ -35,7 +37,9 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
       backgroundColor: Colors.grey.shade100,
 
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
+        onPressed: () {
+          showModalBottomSheet(context: context, builder: (context)=>BookUpdateScreen(book: book!));
+        },
         child: Icon(Icons.edit),
       ),
       appBar: AppBar(
@@ -43,11 +47,37 @@ class _BookDetailScreenState extends State<BookDetailScreen> {
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         elevation: 0,
-        actions: [IconButton(onPressed: () {}, icon: Icon(Icons.delete))],
+        actions: [
+          IconButton(
+            onPressed: () async {
+              bool ans = await BookRemoteServices().deleteBookById(
+                widget.bookId,
+              );
+              if (ans) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Book deleted successfully!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+                Navigator.of(context).push(MaterialPageRoute(builder: (ctx)=>BookHomeScreen()));
+              }
+              else{
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Could not delete'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
+              }
+            },
+            icon: Icon(Icons.delete),
+          ),
+        ],
       ),
       body: Visibility(
         visible: isLoaded,
-        child: ShowBook(),
+        child: isLoaded ?  ShowBook() : Text(""),
         replacement: Center(child: CircularProgressIndicator()),
       ),
     );
